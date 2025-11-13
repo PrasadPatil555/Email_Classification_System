@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Email Classifier",
+  "version": "1.0",
+  "description": "Classify Gmail emails using your AI backend",
+  "permissions": ["scripting", "activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "128": "icons/icon128.png"
+  }
+}

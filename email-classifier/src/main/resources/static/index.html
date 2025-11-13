@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Classifier</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        textarea {
+            width: 60%;
+            height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 70%;
+            background: white;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<h1>Email Classifier</h1>
+
+<textarea id="emailContent" placeholder="Type your email here..."></textarea><br>
+<button onclick="classifyEmail()">Classify & Save</button>
+
+<div id="result"></div>
+
+<h2>Saved Emails</h2>
+<table id="emailTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Content</th>
+        <th>Category</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    async function classifyEmail() {
+        const content = document.getElementById("emailContent").value;
+
+        const response = await fetch("/api/email/classify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content: content })
+        });
+
+        const data = await response.json();
+        document.getElementById("result").innerText = "Predicted Category: " + data.category;
+
+        loadEmails();
+    }
+
+    async function loadEmails() {
+        const response = await fetch("/api/email/all");
+        const emails = await response.json();
+
+        const tbody = document.querySelector("#emailTable tbody");
+        tbody.innerHTML = "";
+
+        emails.forEach(email => {
+            const row = `<tr>
+                            <td>${email.id}</td>
+                            <td>${email.content}</td>
+                            <td>${email.category}</td>
+                         </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    // Load on page load
+    loadEmails();
+</script>
+</body>
+</html>
+<!--<!DOCTYPE html>-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Email Classifier</title>-->
+<!--    &lt;!&ndash; Bootstrap 5 CDN &ndash;&gt;-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    &lt;!&ndash; Optional: Font Awesome for icons &ndash;&gt;-->
+<!--    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">-->
+<!--</head>-->
+<!--<body class="bg-light">-->
+
+<!--&lt;!&ndash; Navbar &ndash;&gt;-->
+<!--<nav class="navbar navbar-dark bg-dark mb-4">-->
+<!--    <div class="container">-->
+<!--        <a class="navbar-brand fw-bold" href="#">📧 Email Classifier</a>-->
+<!--    </div>-->
+<!--</nav>-->
+
+<!--<div class="container">-->
+
+<!--    &lt;!&ndash; Email Input Card &ndash;&gt;-->
+<!--    <div class="card shadow-sm mb-4">-->
+<!--        <div class="card-body">-->
+<!--            <h5 class="card-title">Classify a New Email</h5>-->
+<!--            <form method="post" action="/classify" class="d-flex flex-column flex-md-row gap-2">-->
+<!--                <textarea name="emailContent" class="form-control" placeholder="Enter email text here..." rows="3" required></textarea>-->
+<!--                <button type="submit" class="btn btn-primary align-self-start">-->
+<!--                    <i class="fa-solid fa-magnifying-glass"></i> Classify & Save-->
+<!--                </button>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Predicted Category &ndash;&gt;-->
+<!--    <div th:if="${predictedCategory}" class="alert alert-info shadow-sm">-->
+<!--        <strong>Predicted Category:</strong> <span th:text="${predictedCategory}"></span>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Saved Emails Table &ndash;&gt;-->
+<!--    <div class="card shadow-sm">-->
+<!--        <div class="card-body">-->
+<!--            <h5 class="card-title">Saved Emails</h5>-->
+<!--            <div class="table-responsive">-->
+<!--                <table class="table table-hover align-middle">-->
+<!--                    <thead class="table-dark">-->
+<!--                    <tr>-->
+<!--                        <th>ID</th>-->
+<!--                        <th>Content</th>-->
+<!--                        <th>Category</th>-->
+<!--                    </tr>-->
+<!--                    </thead>-->
+<!--                    <tbody>-->
+<!--                    <tr th:each="email : ${emails}">-->
+<!--                        <td th:text="${email.id}"></td>-->
+<!--                        <td th:text="${email.content}"></td>-->
+<!--                        <td>-->
+<!--                                <span class="badge" th:classappend="${email.category == 'Work'} ? 'bg-primary' :-->
+<!--                                                                     ${email.category == 'Spam'} ? 'bg-danger' :-->
+<!--                                                                     'bg-success'"-->
+<!--                                      th:text="${email.category}">-->
+<!--                                </span>-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                    <tr th:if="${#lists.isEmpty(emails)}">-->
+<!--                        <td colspan="3" class="text-center text-muted">No emails saved yet.</td>-->
+<!--                    </tr>-->
+<!--                    </tbody>-->
+<!--                </table>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--</div>-->
+
+<!--&lt;!&ndash; Bootstrap JS (for responsive navbar & components) &ndash;&gt;-->
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--</body>-->
+<!--</html>-->
