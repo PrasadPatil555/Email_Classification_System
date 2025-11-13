@@ -1,1 +1,2 @@
 # Email_Classification_System
+Developed an Email Classification System using Spring Boot, JavaScript, and Machine Learning to automatically categorize Gmail emails in real time. Integrated a custom “Classify” button within the Gmail interface, dynamically displaying category labels on emails. The system leverages ML algorithms for intelligent sorting, improving email organization and user productivity.
